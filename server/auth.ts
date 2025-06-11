@@ -81,8 +81,8 @@ export async function registerUser(email: string, password: string, name: string
   }
 
   // Check if user already exists
-  const [existingUser] = await db.select().from(users).where(eq(users.email, email));
-  if (existingUser) {
+  const existingUsers = await db.select().from(users).where(eq(users.email, email));
+  if (existingUsers.length > 0) {
     throw new Error("User already exists");
   }
 
@@ -90,7 +90,7 @@ export async function registerUser(email: string, password: string, name: string
   const hashedPassword = await bcrypt.hash(password, 12);
 
   // Create user
-  const [newUser] = await db
+  const newUsers = await db
     .insert(users)
     .values({
       email,
@@ -101,7 +101,7 @@ export async function registerUser(email: string, password: string, name: string
     })
     .returning();
 
-  return newUser;
+  return newUsers[0];
 }
 
 export async function authenticateUser(email: string, password: string) {
@@ -110,7 +110,8 @@ export async function authenticateUser(email: string, password: string) {
     return null;
   }
 
-  const [user] = await db.select().from(users).where(eq(users.email, email));
+  const users = await db.select().from(users).where(eq(users.email, email));
+  const user = users[0];
   if (!user) {
     return null;
   }

@@ -138,7 +138,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMealPlan(id: number): Promise<boolean> {
     const result = await db.delete(mealPlans).where(eq(mealPlans.id, id));
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Activity operations
@@ -175,7 +175,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteActivity(id: number): Promise<boolean> {
     const result = await db.delete(activities).where(eq(activities.id, id));
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Shopping list operations
@@ -204,7 +204,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteShoppingList(id: number): Promise<boolean> {
     const result = await db.delete(shoppingLists).where(eq(shoppingLists.id, id));
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Shopping item operations
@@ -229,7 +229,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteShoppingItem(id: number): Promise<boolean> {
     const result = await db.delete(shoppingItems).where(eq(shoppingItems.id, id));
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 }
 
