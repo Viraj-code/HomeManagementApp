@@ -82,7 +82,7 @@ export async function registerUser(email: string, password: string, name: string
 
   // Check if user already exists
   const existingUsers = await db.select().from(users).where(eq(users.email, email));
-  if (existingUsers.length > 0) {
+  if (Array.isArray(existingUsers) && existingUsers.length > 0) {
     throw new Error("User already exists");
   }
 
@@ -101,7 +101,7 @@ export async function registerUser(email: string, password: string, name: string
     })
     .returning();
 
-  if (!newUsers || newUsers.length === 0) {
+  if (!Array.isArray(newUsers) || newUsers.length === 0) {
     throw new Error("Failed to create user");
   }
 
@@ -115,7 +115,7 @@ export async function authenticateUser(email: string, password: string) {
   }
 
   const foundUsers = await db.select().from(users).where(eq(users.email, email));
-  if (!foundUsers || foundUsers.length === 0) {
+  if (!Array.isArray(foundUsers) || foundUsers.length === 0) {
     return null;
   }
 
