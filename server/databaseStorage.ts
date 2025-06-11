@@ -67,18 +67,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || undefined;
+    const result = await db.select().from(users).where(eq(users.email, email));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await db.insert(users).values(insertUser).returning();
-    if (!result || result.length === 0) {
+    if (!Array.isArray(result) || result.length === 0) {
       throw new Error("Failed to create user");
     }
     return result[0];
@@ -98,8 +98,8 @@ export class DatabaseStorage implements IStorage {
 
   // Meal operations
   async getMeal(id: number): Promise<Meal | undefined> {
-    const [meal] = await db.select().from(meals).where(eq(meals.id, id));
-    return meal || undefined;
+    const result = await db.select().from(meals).where(eq(meals.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getAllMeals(): Promise<Meal[]> {
@@ -107,8 +107,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createMeal(insertMeal: InsertMeal, createdBy: number): Promise<Meal> {
-    const [meal] = await db.insert(meals).values({ ...insertMeal, createdBy }).returning();
-    return meal;
+    const result = await db.insert(meals).values({ ...insertMeal, createdBy }).returning();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error("Failed to create meal");
+    }
+    return result[0];
   }
 
   async getMealsByCreator(userId: number): Promise<Meal[]> {
@@ -117,8 +120,8 @@ export class DatabaseStorage implements IStorage {
 
   // Meal plan operations
   async getMealPlan(id: number): Promise<MealPlan | undefined> {
-    const [plan] = await db.select().from(mealPlans).where(eq(mealPlans.id, id));
-    return plan || undefined;
+    const result = await db.select().from(mealPlans).where(eq(mealPlans.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getMealPlansByUser(userId: number): Promise<MealPlan[]> {
@@ -130,13 +133,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createMealPlan(insertMealPlan: InsertMealPlan): Promise<MealPlan> {
-    const [plan] = await db.insert(mealPlans).values(insertMealPlan).returning();
-    return plan;
+    const result = await db.insert(mealPlans).values(insertMealPlan).returning();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error("Failed to create meal plan");
+    }
+    return result[0];
   }
 
   async updateMealPlan(id: number, updates: Partial<MealPlan>): Promise<MealPlan | undefined> {
-    const [plan] = await db.update(mealPlans).set(updates).where(eq(mealPlans.id, id)).returning();
-    return plan || undefined;
+    const result = await db.update(mealPlans).set(updates).where(eq(mealPlans.id, id)).returning();
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async deleteMealPlan(id: number): Promise<boolean> {
@@ -146,8 +152,8 @@ export class DatabaseStorage implements IStorage {
 
   // Activity operations
   async getActivity(id: number): Promise<Activity | undefined> {
-    const [activity] = await db.select().from(activities).where(eq(activities.id, id));
-    return activity || undefined;
+    const result = await db.select().from(activities).where(eq(activities.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getAllActivities(): Promise<Activity[]> {
@@ -167,13 +173,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createActivity(insertActivity: InsertActivity, createdBy: number): Promise<Activity> {
-    const [activity] = await db.insert(activities).values({ ...insertActivity, createdBy }).returning();
-    return activity;
+    const result = await db.insert(activities).values({ ...insertActivity, createdBy }).returning();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error("Failed to create activity");
+    }
+    return result[0];
   }
 
   async updateActivity(id: number, updates: Partial<Activity>): Promise<Activity | undefined> {
-    const [activity] = await db.update(activities).set(updates).where(eq(activities.id, id)).returning();
-    return activity || undefined;
+    const result = await db.update(activities).set(updates).where(eq(activities.id, id)).returning();
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async deleteActivity(id: number): Promise<boolean> {
@@ -183,8 +192,8 @@ export class DatabaseStorage implements IStorage {
 
   // Shopping list operations
   async getShoppingList(id: number): Promise<ShoppingList | undefined> {
-    const [list] = await db.select().from(shoppingLists).where(eq(shoppingLists.id, id));
-    return list || undefined;
+    const result = await db.select().from(shoppingLists).where(eq(shoppingLists.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getAllShoppingLists(): Promise<ShoppingList[]> {
@@ -196,13 +205,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createShoppingList(insertList: InsertShoppingList, createdBy: number): Promise<ShoppingList> {
-    const [list] = await db.insert(shoppingLists).values({ ...insertList, createdBy }).returning();
-    return list;
+    const result = await db.insert(shoppingLists).values({ ...insertList, createdBy }).returning();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error("Failed to create shopping list");
+    }
+    return result[0];
   }
 
   async updateShoppingList(id: number, updates: Partial<ShoppingList>): Promise<ShoppingList | undefined> {
-    const [list] = await db.update(shoppingLists).set(updates).where(eq(shoppingLists.id, id)).returning();
-    return list || undefined;
+    const result = await db.update(shoppingLists).set(updates).where(eq(shoppingLists.id, id)).returning();
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async deleteShoppingList(id: number): Promise<boolean> {
@@ -212,8 +224,8 @@ export class DatabaseStorage implements IStorage {
 
   // Shopping item operations
   async getShoppingItem(id: number): Promise<ShoppingItem | undefined> {
-    const [item] = await db.select().from(shoppingItems).where(eq(shoppingItems.id, id));
-    return item || undefined;
+    const result = await db.select().from(shoppingItems).where(eq(shoppingItems.id, id));
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async getShoppingItemsByList(listId: number): Promise<ShoppingItem[]> {
@@ -221,13 +233,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createShoppingItem(insertItem: InsertShoppingItem, addedBy: number): Promise<ShoppingItem> {
-    const [item] = await db.insert(shoppingItems).values({ ...insertItem, addedBy }).returning();
-    return item;
+    const result = await db.insert(shoppingItems).values({ ...insertItem, addedBy }).returning();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error("Failed to create shopping item");
+    }
+    return result[0];
   }
 
   async updateShoppingItem(id: number, updates: Partial<ShoppingItem>): Promise<ShoppingItem | undefined> {
-    const [item] = await db.update(shoppingItems).set(updates).where(eq(shoppingItems.id, id)).returning();
-    return item || undefined;
+    const result = await db.update(shoppingItems).set(updates).where(eq(shoppingItems.id, id)).returning();
+    return Array.isArray(result) && result.length > 0 ? result[0] : undefined;
   }
 
   async deleteShoppingItem(id: number): Promise<boolean> {
