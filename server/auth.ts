@@ -101,6 +101,10 @@ export async function registerUser(email: string, password: string, name: string
     })
     .returning();
 
+  if (!newUsers || newUsers.length === 0) {
+    throw new Error("Failed to create user");
+  }
+
   return newUsers[0];
 }
 
@@ -110,12 +114,12 @@ export async function authenticateUser(email: string, password: string) {
     return null;
   }
 
-  const users = await db.select().from(users).where(eq(users.email, email));
-  const user = users[0];
-  if (!user) {
+  const foundUsers = await db.select().from(users).where(eq(users.email, email));
+  if (!foundUsers || foundUsers.length === 0) {
     return null;
   }
 
+  const user = foundUsers[0];
   const isValidPassword = await bcrypt.compare(password, user.password);
   return isValidPassword ? user : null;
 }
